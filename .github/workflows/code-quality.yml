@@ -1,0 +1,26 @@
+name: code-quality.yml
+on:
+  push:
+    branches: [main]
+jobs:
+  analysis:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4.0.0
+      - name: Set up JDK
+        uses: actions/setup-java@v4.0.0
+        with:
+          distribution: 'temurin'
+          java-version: '25'
+      - name: Run checkstyle
+        run: mvn checkstyle:checkstyle
+      - name: SpotsBugs
+        run: mvn com.github.spotbugs:spotbugs-maven-plugin:spotbugs
+      - name: Dependency Check
+        run: mvn org.owasp:dependency-check-maven:8.1.1:check
+      - name: Upload Report
+        uses: actions/upload-artifact@v5.0.0
+        with:
+          name: code-quality-reports
+          path: target/*-reports*
+
